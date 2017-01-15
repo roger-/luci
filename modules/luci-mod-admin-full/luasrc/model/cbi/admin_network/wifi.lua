@@ -313,6 +313,36 @@ if hwtype == "broadcom" then
 			%{ p.display_dbm, p.display_mw })
 	end
 
+	mode = s:taboption("advanced", ListValue, "hwmode", translate("Band"))
+	if hw_modes.b then
+		mode:value("11b", "2.4GHz (802.11b)")
+		if hw_modes.g then
+			mode:value("11bg", "2.4GHz (802.11b+g)")
+		end
+	end
+	if hw_modes.g then
+		mode:value("11g", "2.4GHz (802.11g)")
+		mode:value("11gst", "2.4GHz (802.11g + Turbo)")
+		mode:value("11lrs", "2.4GHz (802.11g Limited Rate Support)")
+	end
+	if hw_modes.a then mode:value("11a", "5GHz (802.11a)") end
+	if hw_modes.n then
+		if hw_modes.g then
+			mode:value("11ng", "2.4GHz (802.11g+n)")
+			mode:value("11n", "2.4GHz (802.11n)")
+		end
+		if hw_modes.a then
+			mode:value("11na", "5GHz (802.11a+n)")
+			mode:value("11n", "5GHz (802.11n)")
+		end
+		htmode = s:taboption("advanced", ListValue, "htmode", translate("HT mode (802.11n)"))
+		htmode:depends("hwmode", "11ng")
+		htmode:depends("hwmode", "11na")
+		htmode:depends("hwmode", "11n")
+		htmode:value("HT20", "20MHz")
+		htmode:value("HT40", "40MHz")
+	end
+
 	ant1 = s:taboption("advanced", ListValue, "txantenna", translate("Transmitter Antenna"))
 	ant1.widget = "radio"
 	ant1:depends("diversity", "")
@@ -966,6 +996,24 @@ if hwtype == "atheros" or hwtype == "mac80211" or hwtype == "prism2" then
 	identity:depends({mode="sta", eap_type="tls", encryption="wpa"})
 	identity:depends({mode="sta-wds", eap_type="tls", encryption="wpa2"})
 	identity:depends({mode="sta-wds", eap_type="tls", encryption="wpa"})
+
+	anonymous_identity = s:taboption("encryption", Value, "anonymous_identity", translate("Anonymous Identity"))
+	anonymous_identity:depends({mode="sta", eap_type="fast", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta", eap_type="fast", encryption="wpa"})
+	anonymous_identity:depends({mode="sta", eap_type="peap", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta", eap_type="peap", encryption="wpa"})
+	anonymous_identity:depends({mode="sta", eap_type="ttls", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta", eap_type="ttls", encryption="wpa"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="fast", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="fast", encryption="wpa"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="peap", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="peap", encryption="wpa"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="ttls", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="ttls", encryption="wpa"})
+	anonymous_identity:depends({mode="sta", eap_type="tls", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta", eap_type="tls", encryption="wpa"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="tls", encryption="wpa2"})
+	anonymous_identity:depends({mode="sta-wds", eap_type="tls", encryption="wpa"})
 
 	password = s:taboption("encryption", Value, "password", translate("Password"))
 	password:depends({mode="sta", eap_type="fast", encryption="wpa2"})

@@ -1,4 +1,4 @@
--- Copyright 2016 Openwrt.org
+-- Copyright 2016 Hannu Nyman
 -- Licensed to the public under the Apache License 2.0.
 
 m = Map("adblock", translate("Adblock"),
@@ -12,21 +12,10 @@ o1 = s:option(Flag, "adb_enabled", translate("Enable adblock"))
 o1.rmempty = false
 o1.default = 0
 
-o2 = s:option(Value, "adb_blacklist", translate("Blacklist file"),
-     translate("File with explicitly blacklisted hosts/domains."))
-o2.rmempty = false
-o2.datatype = "file"
-
 o3 = s:option(Value, "adb_whitelist", translate("Whitelist file"),
      translate("File with whitelisted hosts/domains that are allowed despite being on a blocklist."))
 o3.rmempty = false
 o3.datatype = "file"
-
-fdns = s:option(Flag, "adb_forcedns", translate("Redirect all DNS queries to the local resolver"),
-        translate("When adblock is active, all DNS queries are redirected to the local resolver " ..
-        "in this server by default. You can disable that to allow queries to external DNS servers."))
-fdns.rmempty = false
-fdns.default = fdns.enabled
 
 -- Blocklist options
 
@@ -41,8 +30,7 @@ bl.template = "cbi/tblsection"
 name = bl:option(Flag, "enabled", translate("Enabled"))
 name.rmempty  = false
 
-des = bl:option(DummyValue, "adb_srcdesc", translate("Description"))
-des.rmempty  = false
+des = bl:option(DummyValue, "adb_src_desc", translate("Description"))
 
 -- Additional options
 
@@ -52,7 +40,7 @@ o4 = s2:option(Flag, "enabled", translate("Enable blocklist backup"))
 o4.rmempty = false
 o4.default = 0
 
-o5 = s2:option(Value, "adb_backupdir", translate("Backup directory"))
+o5 = s2:option(Value, "adb_dir", translate("Backup directory"))
 o5.rmempty = false
 o5.datatype = "directory"
 
@@ -61,30 +49,15 @@ o5.datatype = "directory"
 e = m:section(NamedSection, "global", "adblock", translate("Extra options"),
 	translate("Options for further tweaking in case the defaults are not suitable for you."))
 
-a1 = e:option(Value, "adb_port", translate("Port of the adblock uhttpd instance"))
-a1.optional = true
-a1.default = 65535
-a1.datatype = "port"
+a = e:option(Flag, "adb_debug", translate("Enable verbose debug logging"))
+a.default = a.disabled
+a.rmempty = false
 
-a2 = e:option(Value, "adb_nullipv4", translate("IPv4 blackhole ip address"))
-a2.optional = true
-a2.default = "192.0.2.1"
-a2.datatype = "ip4addr"
-
-a3 = e:option(Value, "adb_nullipv6", translate("IPv6 blackhole ip address"))
-a3.optional = true
-a3.default = "::ffff:c000:0201"
-a3.datatype = "ip6addr"
-
-a6 = e:option(Value, "adb_wanif", translate("Name of the logical wan interface"))
-a6.optional = true
-a6.default = "wan"
-a6.datatype = "network"
-
-a7 = e:option(Value, "adb_lanif", translate("Name of the logical lan interface"))
-a7.optional = true
-a7.default = "lan"
-a7.datatype = "network"
+a = e:option(Value, "adb_iface", translate("Restrict reload trigger to certain interface(s)"),
+	translate("Space separated list of wan interfaces that trigger reload action. " ..
+		"To disable reload trigger set it to 'false'. Default: empty"))
+a.datatype = "network"
+a.rmempty = true
 
 return m
 

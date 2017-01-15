@@ -303,11 +303,11 @@
 						info.dsl.annex_s,
 						info.dsl.profile_s,
 						info.dsl.data_rate_down_s, info.dsl.data_rate_up_s,
-						info.dsl.max_data_rate_down_s, info.dsl.max_data_rate_up_s,						
+						info.dsl.max_data_rate_down_s, info.dsl.max_data_rate_up_s,
 						info.dsl.latency_num_down, info.dsl.latency_num_up,
 						info.dsl.line_attenuation_down, info.dsl.line_attenuation_up,
-						info.dsl.noise_margin_down, info.dsl.noise_margin_up,
 						info.dsl.signal_attenuation_down, info.dsl.signal_attenuation_up,
+						info.dsl.noise_margin_down, info.dsl.noise_margin_up,
 						info.dsl.actatp_down, info.dsl.actatp_up,
 						info.dsl.errors_fec_near, info.dsl.errors_fec_far,
 						info.dsl.errors_es_near, info.dsl.errors_es_far,
@@ -341,7 +341,9 @@
 				{
 					var timestr;
 
-					if (info.leases[i].expires <= 0)
+					if (info.leases[i].expires === false)
+						timestr = '<em><%:unlimited%></em>';
+					else if (info.leases[i].expires <= 0)
 						timestr = '<em><%:expired%></em>';
 					else
 						timestr = String.format('%t', info.leases[i].expires);
@@ -379,7 +381,9 @@
 				{
 					var timestr;
 
-					if (info.leases6[i].expires <= 0)
+					if (info.leases6[i].expires === false)
+						timestr = '<em><%:unlimited%></em>';
+					else if (info.leases6[i].expires <= 0)
 						timestr = '<em><%:expired%></em>';
 					else
 						timestr = String.format('%t', info.leases6[i].expires);
@@ -471,7 +475,7 @@
 								'<strong><%:Bitrate%>:</strong> %s <%:Mbit/s%><br />',
 								icon, net.signal, net.noise,
 								net.quality,
-								net.link, net.ssid,
+								net.link, net.ssid || '?',
 								net.mode,
 								net.channel, net.frequency,
 								net.bitrate || '?'
@@ -482,7 +486,7 @@
 							s += String.format(
 								'<strong><%:BSSID%>:</strong> %s<br />' +
 								'<strong><%:Encryption%>:</strong> %s',
-									net.bssid,
+									net.bssid || '?',
 									net.encryption
 							);
 						}

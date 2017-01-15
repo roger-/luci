@@ -48,24 +48,33 @@ local function dhcp_leases_common(family)
 		fd:close()
 	end
 
-	local fd = io.open("/tmp/hosts/odhcpd", "r")
+	local lease6file = "/tmp/hosts/odhcpd"
+	uci:foreach("dhcp", "odhcpd",
+		function(t)
+			if t.leasefile and nfs.access(t.leasefile) then
+				lease6file = t.leasefile
+				return false
+			end
+		end)
+	local fd = io.open(lease6file, "r")
 	if fd then
 		while true do
 			local ln = fd:read("*l")
 			if not ln then
 				break
 			else
-				local iface, duid, iaid, name, ts, id, length, ip = ln:match("^# (%S+) (%S+) (%S+) (%S+) (%d+) (%S+) (%S+) (.*)")
+				local iface, duid, iaid, name, ts, id, length, ip = ln:match("^# (%S+) (%S+) (%S+) (%S+) (-?%d+) (%S+) (%S+) (.*)")
+				local expire = tonumber(ts) or 0
 				if ip and iaid ~= "ipv4" and family == 6 then
 					rv[#rv+1] = {
-						expires  = os.difftime(tonumber(ts) or 0, os.time()),
+						expires  = (expire >= 0) and os.difftime(expire, os.time()),
 						duid     = duid,
 						ip6addr  = ip,
 						hostname = (name ~= "-") and name
 					}
 				elseif ip and iaid == "ipv4" and family == 4 then
 					rv[#rv+1] = {
-						expires  = os.difftime(tonumber(ts) or 0, os.time()),
+						expires  = (expire >= 0) and os.difftime(expire, os.time()),
 						macaddr  = duid,
 						ipaddr   = ip,
 						hostname = (name ~= "-") and name
